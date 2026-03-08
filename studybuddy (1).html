@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyBuddy AI 🚀</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#07080f;--s1:#0d0f1c;--s2:#131627;--s3:#1a1e35;
+  --border:#252a45;--a1:#00d4ff;--a2:#ff6b9d;--a3:#7fff6b;
+  --a4:#ffb347;--a5:#bf5fff;--txt:#dde2ff;--muted:#5a6090;
+  --font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 50% at 15% 10%,rgba(0,212,255,.07) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 90%,rgba(255,107,157,.06) 0%,transparent 70%);
+  animation:bgP 8s ease-in-out infinite alternate;}
+@keyframes bgP{from{opacity:.5}to{opacity:1}}
+
+/* GATE */
+#gate{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.gcard{background:var(--s2);border:1px solid var(--border);border-radius:24px;padding:38px 34px;max-width:520px;width:100%;position:relative;overflow:hidden;}
+.gcard::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,212,255,.12),transparent 70%);border-radius:50%;}
+.glogo{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--a1),var(--a5),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
+.gtag{color:var(--muted);font-size:.9rem;margin-bottom:24px;line-height:1.65;}
+.badge{display:inline-block;background:rgba(127,255,107,.15);border:1px solid rgba(127,255,107,.4);color:var(--a3);font-size:.72rem;font-weight:800;padding:2px 10px;border-radius:20px;margin-left:6px;vertical-align:middle;}
+.glabel{font-size:.74rem;color:var(--a1);letter-spacing:.07em;text-transform:uppercase;font-weight:700;margin-bottom:7px;}
+.ginput{width:100%;padding:13px 16px;background:var(--s1);border:1.5px solid var(--border);border-radius:12px;color:var(--txt);font-size:.92rem;font-family:var(--mono);outline:none;transition:border-color .2s;}
+.ginput:focus{border-color:var(--a1);}
+.gbtn{width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,var(--a1),var(--a5));border:none;border-radius:12px;color:#000;font-family:var(--font);font-weight:800;font-size:1rem;cursor:pointer;transition:transform .15s,opacity .2s;}
+.gbtn:hover{transform:translateY(-2px);opacity:.9;}
+.glinks{margin-top:14px;font-size:.82rem;color:var(--muted);line-height:1.9;}
+.glinks a{color:var(--a1);text-decoration:none;font-weight:600;}
+.glinks a:hover{text-decoration:underline;}
+.gsteps{margin-top:18px;background:var(--s3);border-radius:12px;padding:16px 18px;}
+.gsteps p{font-size:.82rem;line-height:2;color:var(--muted);}
+.gsteps strong{color:var(--txt);}
+
+/* LAYOUT */
+#app{display:none;height:100vh;flex-direction:row;}
+#app.show{display:flex;}
+
+/* SIDEBAR */
+.sb{width:215px;min-width:215px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 10px;gap:3px;overflow-y:auto;flex-shrink:0;}
+.sblogo{font-size:1.2rem;font-weight:900;padding:6px 10px 18px;background:linear-gradient(135deg,var(--a1),var(--a5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nb{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:11px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-size:.86rem;font-weight:600;cursor:pointer;transition:all .18s;text-align:left;width:100%;}
+.nb:hover{background:var(--s2);color:var(--txt);}
+.nb.on{background:linear-gradient(135deg,rgba(0,212,255,.14),rgba(191,95,255,.08));color:var(--a1);border:1px solid rgba(0,212,255,.22);}
+.nb .ico{font-size:1.05rem;flex-shrink:0;}
+.sbdiv{height:1px;background:var(--border);margin:7px 0;}
+.sbfoot{margin-top:auto;font-size:.7rem;color:var(--muted);padding:8px 12px;line-height:1.6;}
+.sbfoot span{color:var(--a3);}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:26px 28px;min-width:0;}
+.main::-webkit-scrollbar{width:4px;}
+.main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.panel{display:none;animation:su .26s ease;}
+.panel.on{display:block;}
+@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ph{font-size:1.65rem;font-weight:900;letter-spacing:-.4px;margin-bottom:3px;}
+.ps{color:var(--muted);font-size:.88rem;margin-bottom:22px;}
+
+/* CARDS */
+.card{background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:20px;}
+
+/* INPUTS */
+.fi{width:100%;padding:10px 13px;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font-size:.88rem;font-family:var(--font);outline:none;transition:border-color .2s;}
+.fi:focus{border-color:var(--a1);}
+.fsel{width:100%;padding:10px 13px;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font-size:.88rem;font-family:var(--font);outline:none;}
+.fsel option{background:var(--s1);}
+.fta{width:100%;padding:10px 13px;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;color:var(--txt);font-size:.88rem;font-family:var(--font);outline:none;resize:vertical;min-height:80px;}
+.fta:focus{border-color:var(--a1);}
+.flabel{font-size:.74rem;color:var(--a1);letter-spacing:.06em;text-transform:uppercase;font-weight:700;margin-bottom:6px;}
+.frow{display:flex;flex-direction:column;gap:5px;}
+
+/* BUTTONS */
+.btn{padding:11px 20px;border:none;border-radius:10px;font-family:var(--font);font-weight:700;font-size:.88rem;cursor:pointer;transition:transform .15s,opacity .2s;}
+.btn:hover{transform:translateY(-1px);opacity:.9;}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-c{background:linear-gradient(135deg,var(--a1),#006eff);color:#000;}
+.btn-p{background:linear-gradient(135deg,var(--a2),var(--a5));color:#fff;}
+.btn-g{background:linear-gradient(135deg,var(--a3),#00c9a7);color:#000;}
+.btn-o{background:linear-gradient(135deg,var(--a4),var(--a2));color:#000;}
+
+/* CHIPS */
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.chip{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--s1);color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .18s;font-family:var(--font);}
+.chip:hover{border-color:var(--a1);color:var(--a1);}
+.chip.on{background:rgba(0,212,255,.13);border-color:var(--a1);color:var(--a1);}
+
+/* LOADER */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px;}
+@keyframes sp{to{transform:rotate(360deg)}}
+.thinking{display:flex;gap:5px;padding:12px 16px;align-items:center;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--a1);animation:bop 1.1s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:.18s;background:var(--a5);}
+.dot:nth-child(3){animation-delay:.36s;background:var(--a2);}
+@keyframes bop{0%,80%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-7px) scale(1.2)}}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 160px);}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:13px;padding-right:5px;margin-bottom:13px;scroll-behavior:smooth;}
+.chat-msgs::-webkit-scrollbar{width:4px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.msg{display:flex;gap:9px;align-items:flex-start;max-width:84%;}
+.msg.u{flex-direction:row-reverse;margin-left:auto;}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.msg.ai .av{background:linear-gradient(135deg,var(--a1),var(--a5));}
+.msg.u .av{background:var(--s3);border:1px solid var(--border);}
+.bbl{padding:11px 15px;border-radius:13px;font-size:.88rem;line-height:1.65;max-width:100%;}
+.msg.ai .bbl{background:var(--s2);border:1px solid var(--border);border-radius:4px 13px 13px 13px;}
+.msg.u .bbl{background:linear-gradient(135deg,rgba(0,212,255,.22),rgba(191,95,255,.13));border:1px solid rgba(0,212,255,.18);border-radius:13px 4px 13px 13px;}
+.chat-row{display:flex;gap:9px;}
+.cta{flex:1;padding:12px 15px;background:var(--s2);border:1.5px solid var(--border);border-radius:13px;color:var(--txt);font-size:.88rem;font-family:var(--font);outline:none;resize:none;transition:border-color .2s;line-height:1.5;}
+.cta:focus{border-color:var(--a1);}
+.sbtn{padding:12px 16px;background:linear-gradient(135deg,var(--a1),var(--a5));border:none;border-radius:13px;color:#000;font-size:1.05rem;cursor:pointer;transition:transform .15s;font-weight:900;}
+.sbtn:hover:not(:disabled){transform:scale(1.08);}
+.sbtn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* PLANNER */
+.plan-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px;}
+.plan-form{display:flex;flex-direction:column;gap:12px;}
+.plan-out{white-space:pre-wrap;font-size:.86rem;line-height:1.85;}
+
+/* FLASHCARDS */
+.fc-scene{perspective:1200px;width:100%;max-width:500px;height:250px;margin:0 auto 18px;cursor:pointer;}
+.fc-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);}
+.fc-inner.flip{transform:rotateY(180deg);}
+.fc-f,.fc-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px;text-align:center;}
+.fc-f{background:linear-gradient(135deg,rgba(0,212,255,.11),rgba(191,95,255,.07));border:1.5px solid rgba(0,212,255,.22);font-size:1.1rem;font-weight:800;}
+.fc-b{background:linear-gradient(135deg,rgba(127,255,107,.09),rgba(255,179,71,.06));border:1.5px solid rgba(127,255,107,.28);transform:rotateY(180deg);font-size:.9rem;line-height:1.65;}
+.fc-tag{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;opacity:.55;}
+.fc-hint{font-size:.76rem;color:var(--muted);text-align:center;margin-bottom:10px;}
+.fc-nav{display:flex;justify-content:center;align-items:center;gap:10px;}
+.fc-nb{padding:8px 18px;background:var(--s3);border:1px solid var(--border);border-radius:9px;color:var(--txt);cursor:pointer;font-family:var(--font);font-weight:600;font-size:.82rem;transition:all .18s;}
+.fc-nb:hover{border-color:var(--a1);color:var(--a1);}
+.fc-ct{color:var(--muted);font-size:.8rem;min-width:55px;text-align:center;}
+.fc-prog{display:flex;gap:5px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;}
+.fc-dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:background .2s;}
+.fc-dot.done{background:var(--a3);}
+.fc-dot.cur{background:var(--a1);}
+
+/* QUIZ */
+.qhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.qpbar{flex:1;height:5px;background:var(--s3);border-radius:3px;margin:0 14px;overflow:hidden;}
+.qpfill{height:100%;background:linear-gradient(90deg,var(--a1),var(--a5));border-radius:3px;transition:width .4s;}
+.qq{font-size:1rem;font-weight:700;margin-bottom:18px;padding:16px 18px;background:var(--s3);border-radius:13px;border-left:3px solid var(--a1);line-height:1.55;}
+.qopts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.qopt{padding:12px 16px;border-radius:11px;border:1.5px solid var(--border);background:var(--s2);color:var(--txt);cursor:pointer;font-size:.88rem;font-family:var(--font);text-align:left;transition:all .18s;font-weight:500;}
+.qopt:hover:not(:disabled){border-color:var(--a1);background:rgba(0,212,255,.06);}
+.qopt.ok{background:rgba(127,255,107,.11);border-color:var(--a3);color:var(--a3);}
+.qopt.no{background:rgba(255,107,157,.09);border-color:var(--a2);color:var(--a2);}
+.qxp{padding:13px 16px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:11px;font-size:.85rem;line-height:1.65;margin-bottom:12px;display:none;}
+.qnxt{padding:9px 22px;background:linear-gradient(135deg,var(--a1),var(--a5));border:none;border-radius:9px;color:#000;font-family:var(--font);font-weight:800;cursor:pointer;font-size:.88rem;display:none;}
+.res-wrap{text-align:center;padding:28px 18px;}
+.res-big{font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,var(--a1),var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+
+/* MINDMAP */
+.mm-wrap{background:var(--s2);border:1px solid var(--border);border-radius:16px;min-height:360px;display:flex;align-items:center;justify-content:center;overflow:auto;padding:8px;}
+
+/* MOTIVATION */
+.moti-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:18px;margin-bottom:18px;}
+.moti-quote{font-size:1.4rem;font-weight:900;line-height:1.45;text-align:center;background:linear-gradient(135deg,var(--a1),var(--a2),var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;padding:8px;}
+.moti-tip{margin-top:12px;padding:14px 16px;background:rgba(127,255,107,.06);border:1px solid rgba(127,255,107,.18);border-radius:11px;font-size:.86rem;line-height:1.7;}
+
+/* UTILS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+
+@media(max-width:700px){
+  .sb{width:52px;min-width:52px;padding:14px 6px;}
+  .nb span:not(.ico){display:none;}.sblogo{font-size:0;}.sblogo::before{content:'🚀';font-size:1.2rem;}.sbfoot{display:none;}
+  .main{padding:16px 12px;}
+  .plan-grid,.moti-grid,.g2{grid-template-columns:1fr;}
+  .chat-wrap{height:calc(100vh - 130px);}
+}
+</style>
+</head>
+<body>
+
+<!-- GATE -->
+<div id="gate">
+  <div class="gcard">
+    <div class="glogo">🚀 StudyBuddy AI</div>
+    <div class="gtag">All-in-one AI study companion — Chat, Planner, Flashcards, Quiz, Mind Maps &amp; Motivation<br/>
+      Powered by <strong>Groq AI</strong> <span class="badge">100% FREE ✅ Works in India 🇮🇳</span>
+    </div>
+    <div class="glabel">Groq API Key</div>
+    <input type="password" id="apikey" class="ginput" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx"/>
+    <button class="gbtn" onclick="launch()">⚡ Launch StudyBuddy</button>
+    <div class="glinks">
+      🔑 Get free key → <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a><br/>
+      ✅ Completely free · No credit card needed · Works everywhere
+    </div>
+    <div class="gsteps">
+      <p>
+        <strong>⚡ Get your free key in 60 seconds:</strong><br/>
+        1️⃣ Click the link above → Sign up with Google account<br/>
+        2️⃣ Click <strong>"Create API Key"</strong> → give it any name<br/>
+        3️⃣ Copy the key starting with <strong>gsk_</strong><br/>
+        4️⃣ Paste it above and click Launch!
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sb">
+    <div class="sblogo">StudyBuddy AI</div>
+    <button class="nb on" id="nb-chat" onclick="sw('chat')"><span class="ico">💬</span><span>AI Chat</span></button>
+    <button class="nb" id="nb-plan" onclick="sw('plan')"><span class="ico">📅</span><span>Planner</span></button>
+    <button class="nb" id="nb-flash" onclick="sw('flash')"><span class="ico">🃏</span><span>Flashcards</span></button>
+    <button class="nb" id="nb-quiz" onclick="sw('quiz')"><span class="ico">🎯</span><span>MCQ Quiz</span></button>
+    <button class="nb" id="nb-mmap" onclick="sw('mmap')"><span class="ico">🗺️</span><span>Mind Map</span></button>
+    <button class="nb" id="nb-moti" onclick="sw('moti')"><span class="ico">🔥</span><span>Motivation</span></button>
+    <div class="sbdiv"></div>
+    <div class="sbfoot">Groq + Llama 3.3<br/><span>● Free to use</span></div>
+  </div>
+
+  <div class="main">
+
+    <!-- CHAT -->
+    <div class="panel on" id="p-chat">
+      <div class="ph">💬 AI Study Chat</div>
+      <div class="ps">Ask anything — concepts, doubts, problems, homework help</div>
+      <div class="chips" id="mode-chips">
+        <button class="chip on" onclick="setmode(this,'general')">🧠 General</button>
+        <button class="chip" onclick="setmode(this,'simple')">📖 Explain Simply</button>
+        <button class="chip" onclick="setmode(this,'doubt')">⚡ Quick Doubt</button>
+        <button class="chip" onclick="setmode(this,'tutor')">👨‍🏫 Step-by-Step</button>
+        <button class="chip" onclick="setmode(this,'exam')">📝 Exam Prep</button>
+      </div>
+      <div class="card chat-wrap">
+        <div class="chat-msgs" id="msgs">
+          <div class="msg ai">
+            <div class="av">🤖</div>
+            <div class="bbl">Hey! 👋 I'm your <strong>StudyBuddy AI</strong>, powered by Groq + Llama 3 — super fast and completely free!<br/><br/>Ask me anything — tough concepts, maths, science, history, coding — I've got you! What are we studying today? 🎯</div>
+          </div>
+        </div>
+        <div class="chat-row">
+          <textarea class="cta" id="cta" rows="2" placeholder="Type your question… (Enter to send, Shift+Enter = new line)"></textarea>
+          <button class="sbtn" id="sndbtn" onclick="sendMsg()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLANNER -->
+    <div class="panel" id="p-plan">
+      <div class="ph">📅 Smart Study Planner</div>
+      <div class="ps">Fill your details — AI builds a complete personalized schedule</div>
+      <div class="plan-grid">
+        <div class="card">
+          <div class="plan-form">
+            <div class="frow"><div class="flabel">📚 Subject / Exam</div><input class="fi" id="psubj" placeholder="e.g. JEE Physics, Class 10 Maths"/></div>
+            <div class="g2">
+              <div class="frow"><div class="flabel">📆 Days Left</div><input class="fi" id="pdays" type="number" min="1" max="365" placeholder="30"/></div>
+              <div class="frow"><div class="flabel">⏰ Hours/Day</div><input class="fi" id="phours" type="number" min="1" max="16" placeholder="4"/></div>
+            </div>
+            <div class="frow"><div class="flabel">📊 Your Level</div>
+              <select class="fsel" id="plvl">
+                <option value="complete beginner">Complete Beginner</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div class="frow"><div class="flabel">🎯 Goal</div><input class="fi" id="pgoal" placeholder="e.g. Score 90%+, crack NEET"/></div>
+            <div class="frow"><div class="flabel">⚠️ Weak Areas</div><input class="fi" id="pweak" placeholder="e.g. Organic Chemistry, Calculus"/></div>
+            <button class="btn btn-c" id="planbtn" onclick="makePlan()">✨ Generate My Plan</button>
+          </div>
+        </div>
+        <div class="card" style="overflow-y:auto;max-height:500px;">
+          <div id="planout" class="plan-out" style="color:var(--muted)">Your personalized study plan will appear here…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLASHCARDS -->
+    <div class="panel" id="p-flash">
+      <div class="ph">🃏 Flashcards</div>
+      <div class="ps">AI-generated flip cards — click to reveal the answer!</div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="flex">
+          <div class="frow" style="flex:1;min-width:170px;"><div class="flabel">Topic</div><input class="fi" id="fctopic" placeholder="e.g. Photosynthesis, French Revolution, Python"/></div>
+          <div class="frow"><div class="flabel">Count</div>
+            <select class="fsel" id="fcct" style="width:84px">
+              <option value="5">5</option><option value="8" selected>8</option><option value="10">10</option>
+            </select>
+          </div>
+          <button class="btn btn-p" id="fcbtn" onclick="makeCards()" style="margin-top:22px;">✨ Generate</button>
+        </div>
+      </div>
+      <div id="fc-area" style="display:none;">
+        <div class="card">
+          <div class="fc-prog" id="fc-prog"></div>
+          <div class="fc-scene" onclick="flipCard()">
+            <div class="fc-inner" id="fci">
+              <div class="fc-f"><div class="fc-tag">Question / Term</div><div id="fcfront">…</div></div>
+              <div class="fc-b"><div class="fc-tag">Answer / Explanation</div><div id="fcback">…</div></div>
+            </div>
+          </div>
+          <div class="fc-hint">👆 Click card to flip</div>
+          <div class="fc-nav" style="margin-top:12px;">
+            <button class="fc-nb" onclick="fcgo(-1)">← Prev</button>
+            <span class="fc-ct" id="fc-ct">1 / 8</span>
+            <button class="fc-nb" onclick="fcgo(1)">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="panel" id="p-quiz">
+      <div class="ph">🎯 MCQ Quiz</div>
+      <div class="ps">Test yourself with AI-generated multiple choice questions</div>
+      <div class="card" id="qsetup" style="margin-bottom:16px;">
+        <div class="flex">
+          <div class="frow" style="flex:1;min-width:170px;"><div class="flabel">Topic</div><input class="fi" id="qtopic" placeholder="e.g. Newton's Laws, Algebra, World War 2"/></div>
+          <div class="frow"><div class="flabel">Difficulty</div>
+            <select class="fsel" id="qdiff" style="width:120px">
+              <option value="easy">Easy 🟢</option><option value="medium" selected>Medium 🟡</option><option value="hard">Hard 🔴</option>
+            </select>
+          </div>
+          <div class="frow"><div class="flabel">Questions</div>
+            <select class="fsel" id="qcnt" style="width:86px">
+              <option value="5" selected>5</option><option value="8">8</option><option value="10">10</option>
+            </select>
+          </div>
+          <button class="btn btn-o" id="qbtn" onclick="startQuiz()" style="margin-top:22px;">🎯 Start Quiz</button>
+        </div>
+      </div>
+      <div class="card" id="qarea" style="display:none;">
+        <div class="qhdr">
+          <span style="font-size:.8rem;color:var(--muted)" id="qprog">Q1 of 5</span>
+          <div class="qpbar"><div class="qpfill" id="qfill" style="width:20%"></div></div>
+          <span style="font-size:.8rem;color:var(--a4);font-weight:700" id="qsc">Score: 0</span>
+        </div>
+        <div class="qq" id="qtext"></div>
+        <div class="qopts" id="qopts"></div>
+        <div class="qxp" id="qxp"></div>
+        <button class="qnxt" id="qnxt" onclick="nextQ()">Next Question →</button>
+      </div>
+      <div class="card res-wrap" id="qresult" style="display:none;">
+        <div style="font-size:2.8rem;margin-bottom:8px;">🏆</div>
+        <div class="res-big" id="rfinal"></div>
+        <div style="color:var(--muted);font-size:.95rem;margin-bottom:22px;" id="rmsg"></div>
+        <button class="btn btn-c" onclick="resetQuiz()">🔄 Try Again</button>
+      </div>
+    </div>
+
+    <!-- MINDMAP -->
+    <div class="panel" id="p-mmap">
+      <div class="ph">🗺️ Mind Map</div>
+      <div class="ps">AI builds a visual mind map for any topic instantly</div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="flex">
+          <div class="frow" style="flex:1;min-width:190px;"><div class="flabel">Topic</div><input class="fi" id="mmtopic" placeholder="e.g. Machine Learning, Photosynthesis, Mughal Empire"/></div>
+          <div class="frow"><div class="flabel">Branches</div>
+            <select class="fsel" id="mmbr" style="width:86px">
+              <option value="5" selected>5</option><option value="6">6</option><option value="7">7</option>
+            </select>
+          </div>
+          <button class="btn btn-g" id="mmbtn" onclick="makeMindmap()" style="margin-top:22px;">🗺️ Generate</button>
+        </div>
+      </div>
+      <div class="mm-wrap" id="mmwrap">
+        <div style="color:var(--muted);text-align:center;padding:40px;">Enter a topic and click Generate 🧠</div>
+      </div>
+    </div>
+
+    <!-- MOTIVATION -->
+    <div class="panel" id="p-moti">
+      <div class="ph">🔥 Motivation Mode</div>
+      <div class="ps">AI coach to get you back on track</div>
+      <div class="moti-grid">
+        <div class="card" style="display:flex;flex-direction:column;gap:11px;">
+          <div class="frow"><div class="flabel">How are you feeling?</div>
+            <textarea class="fta" id="motiinput" style="min-height:100px;" placeholder="e.g. I'm exhausted and don't want to study. Exam is tomorrow…"></textarea>
+          </div>
+          <button class="btn btn-p" id="motibtn" onclick="getBoost()">💪 Boost Me!</button>
+          <div class="flabel" style="margin-top:6px;">⚡ Quick Triggers</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;">
+            <button class="chip" onclick="qboost('I feel like giving up studying')">😔 Giving up</button>
+            <button class="chip" onclick="qboost('I cannot focus at all')">😵 Distracted</button>
+            <button class="chip" onclick="qboost('I have exam anxiety and am panicking')">😰 Anxiety</button>
+            <button class="chip" onclick="qboost('I keep procrastinating')">😴 Lazy</button>
+            <button class="chip" onclick="qboost('Give me the most powerful study quote ever')">✨ Inspire me</button>
+          </div>
+        </div>
+        <div class="card" id="motiout">
+          <div style="color:var(--muted);text-align:center;padding:28px;">Your fire starts here 🔥</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let GK = '';
+let chatMode = 'general';
+let chatHist = [];
+let cards = [], ci = 0;
+let qdata = [], qi = 0, qscore = 0;
+
+const GROQ = 'https://api.groq.com/openai/v1/chat/completions';
+const MDL = 'llama-3.3-70b-versatile';
+
+function launch() {
+  const k = document.getElementById('apikey').value.trim();
+  if (!k.startsWith('gsk_')) {
+    alert('Please enter a valid Groq API key starting with gsk_\n\nGet one free at: console.groq.com/keys');
+    return;
+  }
+  GK = k;
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('gate').style.display !== 'none') launch();
+});
+
+async function ai(messages, temp=0.7, max=1500) {
+  const r = await fetch(GROQ, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+GK},
+    body: JSON.stringify({model:MDL, messages, temperature:temp, max_tokens:max})
+  });
+  if (!r.ok) { const e=await r.json(); throw new Error(e.error?.message||'Error '+r.status); }
+  const d = await r.json();
+  return d.choices[0].message.content;
+}
+
+function sw(n) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+n).classList.add('on');
+  document.getElementById('nb-'+n).classList.add('on');
+}
+
+const SYS = {
+  general:'You are StudyBuddy, a helpful friendly AI tutor. Be clear, use examples, format with line breaks.',
+  simple:'Explain everything simply for a curious 14-year-old. Use analogies and real-life examples. Keep it fun and short!',
+  doubt:'Answer doubts directly in max 3-4 sentences. Get straight to the point. No fluff.',
+  tutor:'Be a patient step-by-step tutor. Number every step. Show all working. Explain WHY each step is done.',
+  exam:'Be an exam coach. Focus on key points, common mistakes, mnemonics, and quick-recall tips.'
+};
+
+function setmode(el,m){ chatMode=m; document.querySelectorAll('#mode-chips .chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('cta').addEventListener('keydown', e=>{
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}
+  });
+});
+
+function fmt(t){
+  return t.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--a1)">$1</strong>').replace(/`([^`]+)`/g,'<code style="background:rgba(0,212,255,.12);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:.83em">$1</code>');
+}
+
+function addMsg(role,text){
+  const box=document.getElementById('msgs');
+  const d=document.createElement('div');
+  d.className='msg '+(role==='user'?'u':'ai');
+  d.innerHTML=`<div class="av">${role==='user'?'👤':'🤖'}</div><div class="bbl">${fmt(text)}</div>`;
+  box.appendChild(d); box.scrollTop=box.scrollHeight;
+}
+
+function showTyping(){
+  const box=document.getElementById('msgs');
+  const d=document.createElement('div'); d.className='msg ai'; d.id='typing';
+  d.innerHTML=`<div class="av">🤖</div><div class="bbl"><div class="thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  box.appendChild(d); box.scrollTop=box.scrollHeight;
+}
+
+async function sendMsg(){
+  const ta=document.getElementById('cta');
+  const txt=ta.value.trim(); if(!txt)return;
+  ta.value=''; document.getElementById('sndbtn').disabled=true;
+  addMsg('user',txt);
+  const msgs=[{role:'system',content:SYS[chatMode]},...chatHist,{role:'user',content:txt}];
+  chatHist.push({role:'user',content:txt});
+  showTyping();
+  try{
+    const r=await ai(msgs);
+    document.getElementById('typing')?.remove();
+    addMsg('ai',r); chatHist.push({role:'assistant',content:r});
+  }catch(e){ document.getElementById('typing')?.remove(); addMsg('ai','⚠️ '+e.message); }
+  document.getElementById('sndbtn').disabled=false; ta.focus();
+}
+
+async function makePlan(){
+  const s=document.getElementById('psubj').value.trim();
+  const d=document.getElementById('pdays').value;
+  const h=document.getElementById('phours').value;
+  if(!s||!d||!h){alert('Fill Subject, Days and Hours!');return;}
+  const btn=document.getElementById('planbtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>Generating…';
+  const out=document.getElementById('planout');
+  out.innerHTML='<span class="spin"></span> Building plan…';
+  try{
+    const r=await ai([
+      {role:'system',content:'You are an expert academic coach. Create structured, realistic study plans with clear formatting.'},
+      {role:'user',content:`Study plan for:
+Subject: ${s}, Days: ${d}, Hours/day: ${h}
+Level: ${document.getElementById('plvl').value}
+Goal: ${document.getElementById('pgoal').value||'Master the subject'}
+Weak areas: ${document.getElementById('pweak').value||'none'}
+Give week-by-week breakdown, daily topics, revision days, mock tests, final week strategy.`}
+    ], 0.6, 2000);
+    out.innerHTML=fmt(r);
+  }catch(e){out.innerHTML='⚠️ '+e.message;}
+  btn.disabled=false; btn.innerHTML='✨ Generate My Plan';
+}
+
+async function makeCards(){
+  const t=document.getElementById('fctopic').value.trim();
+  const c=document.getElementById('fcct').value;
+  if(!t){alert('Enter a topic!');return;}
+  const btn=document.getElementById('fcbtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>Generating…';
+  try{
+    const r=await ai([
+      {role:'system',content:'Return ONLY valid JSON arrays. No markdown, no explanation, no code blocks. Just raw JSON.'},
+      {role:'user',content:`Generate exactly ${c} flashcards about "${t}". Return ONLY this JSON format with no other text: [{"front":"question or term","back":"answer or definition"}]`}
+    ], 0.5);
+    cards=JSON.parse(r.replace(/```json|```/g,'').trim());
+    ci=0; buildDots(); showCard(); document.getElementById('fc-area').style.display='block';
+  }catch(e){alert('Error: '+e.message);}
+  btn.disabled=false; btn.innerHTML='✨ Generate';
+}
+
+function buildDots(){ document.getElementById('fc-prog').innerHTML=cards.map((_,i)=>`<div class="fc-dot ${i===0?'cur':''}" id="fcd-${i}"></div>`).join(''); }
+function updateDots(){ cards.forEach((_,i)=>{ const d=document.getElementById('fcd-'+i); if(d) d.className='fc-dot'+(i<ci?' done':i===ci?' cur':''); }); }
+function showCard(){ document.getElementById('fcfront').textContent=cards[ci].front; document.getElementById('fcback').textContent=cards[ci].back; document.getElementById('fc-ct').textContent=`${ci+1} / ${cards.length}`; document.getElementById('fci').classList.remove('flip'); updateDots(); }
+function flipCard(){ document.getElementById('fci').classList.toggle('flip'); }
+function fcgo(d){ ci=(ci+d+cards.length)%cards.length; showCard(); }
+
+async function startQuiz(){
+  const t=document.getElementById('qtopic').value.trim();
+  const df=document.getElementById('qdiff').value;
+  const c=document.getElementById('qcnt').value;
+  if(!t){alert('Enter a topic!');return;}
+  const btn=document.getElementById('qbtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>Generating…';
+  try{
+    const r=await ai([
+      {role:'system',content:'Return ONLY valid JSON arrays. No markdown, no extra text. Just raw JSON.'},
+      {role:'user',content:`Generate exactly ${c} MCQ questions about "${t}" at ${df} difficulty. Return ONLY this JSON with no other text: [{"q":"question?","opts":["A","B","C","D"],"ans":0,"exp":"why correct"}] where ans is 0-based index of correct option.`}
+    ], 0.5);
+    qdata=JSON.parse(r.replace(/```json|```/g,'').trim());
+    qi=0; qscore=0;
+    document.getElementById('qsetup').style.display='none';
+    document.getElementById('qarea').style.display='block';
+    document.getElementById('qresult').style.display='none';
+    renderQ();
+  }catch(e){alert('Error: '+e.message);}
+  btn.disabled=false; btn.innerHTML='🎯 Start Quiz';
+}
+
+function renderQ(){
+  const q=qdata[qi];
+  document.getElementById('qprog').textContent=`Q${qi+1} of ${qdata.length}`;
+  document.getElementById('qfill').style.width=Math.round((qi+1)/qdata.length*100)+'%';
+  document.getElementById('qsc').textContent=`Score: ${qscore}`;
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('qxp').style.display='none';
+  document.getElementById('qnxt').style.display='none';
+  const opts=document.getElementById('qopts'); opts.innerHTML='';
+  q.opts.forEach((o,i)=>{ const b=document.createElement('button'); b.className='qopt'; b.textContent=`${['A','B','C','D'][i]}. ${o}`; b.onclick=()=>ansQ(i); opts.appendChild(b); });
+}
+
+function ansQ(idx){
+  const q=qdata[qi];
+  document.querySelectorAll('.qopt').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.qopt')[q.ans].classList.add('ok');
+  if(idx!==q.ans) document.querySelectorAll('.qopt')[idx].classList.add('no');
+  else qscore++;
+  document.getElementById('qsc').textContent=`Score: ${qscore}`;
+  const xp=document.getElementById('qxp'); xp.innerHTML='💡 <strong>Why:</strong> '+q.exp; xp.style.display='block';
+  document.getElementById('qnxt').style.display='inline-block';
+}
+
+function nextQ(){
+  qi++;
+  if(qi>=qdata.length){
+    document.getElementById('qarea').style.display='none';
+    document.getElementById('qresult').style.display='block';
+    const p=Math.round(qscore/qdata.length*100);
+    document.getElementById('rfinal').textContent=`${qscore}/${qdata.length} — ${p}%`;
+    document.getElementById('rmsg').textContent=['Keep going! 💪','Getting better! 📚','Good effort! 👏','Great work! 🌟','Outstanding! 🏆'][Math.min(Math.floor(p/20),4)];
+  } else renderQ();
+}
+
+function resetQuiz(){ document.getElementById('qsetup').style.display='block'; document.getElementById('qarea').style.display='none'; document.getElementById('qresult').style.display='none'; }
+
+async function makeMindmap(){
+  const t=document.getElementById('mmtopic').value.trim();
+  const br=parseInt(document.getElementById('mmbr').value);
+  if(!t){alert('Enter a topic!');return;}
+  const btn=document.getElementById('mmbtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>Mapping…';
+  const wrap=document.getElementById('mmwrap');
+  wrap.innerHTML='<div style="color:var(--muted);padding:40px"><span class="spin"></span> Generating…</div>';
+  try{
+    const r=await ai([
+      {role:'system',content:'Return ONLY valid JSON. No markdown, no explanation. Just raw JSON.'},
+      {role:'user',content:`Mind map for "${t}". Return ONLY this JSON: {"center":"${t}","branches":[{"label":"name","color":"#hex","children":["item1","item2","item3"]}]} with exactly ${br} branches, max 4 children each, unique vivid hex colors per branch. No other text.`}
+    ], 0.4);
+    const data=JSON.parse(r.replace(/```json|```/g,'').trim());
+    drawMap(data);
+  }catch(e){ wrap.innerHTML='<div style="color:var(--a2);padding:40px;text-align:center">⚠️ '+e.message+'</div>'; }
+  btn.disabled=false; btn.innerHTML='🗺️ Generate';
+}
+
+function drawMap(data){
+  const wrap=document.getElementById('mmwrap');
+  const W=960,H=580,cx=W/2,cy=H/2;
+  const br=data.branches||[]; const n=br.length;
+  const fc=['#00d4ff','#ff6b9d','#7fff6b','#ffb347','#bf5fff','#ff6b35','#00ffcc'];
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px" xmlns="http://www.w3.org/2000/svg">
+<defs><filter id="gl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+  svg+=`<ellipse cx="${cx}" cy="${cy}" rx="88" ry="40" fill="#1a1e35" stroke="#00d4ff" stroke-width="2" filter="url(#gl)"/>`;
+  const cw=(data.center||'').split(' ');
+  if(cw.length<=2){ svg+=`<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="#00d4ff" font-family="Outfit,sans-serif" font-weight="800" font-size="14">${data.center}</text>`; }
+  else{ const h=Math.ceil(cw.length/2); svg+=`<text x="${cx}" y="${cy-9}" text-anchor="middle" dominant-baseline="middle" fill="#00d4ff" font-family="Outfit,sans-serif" font-weight="800" font-size="13">${cw.slice(0,h).join(' ')}</text><text x="${cx}" y="${cy+9}" text-anchor="middle" dominant-baseline="middle" fill="#00d4ff" font-family="Outfit,sans-serif" font-weight="800" font-size="13">${cw.slice(h).join(' ')}</text>`; }
+  br.forEach((b,bi)=>{
+    const ang=(2*Math.PI*bi/n)-Math.PI/2;
+    const bx=cx+215*Math.cos(ang), by=cy+168*Math.sin(ang);
+    const c=b.color||fc[bi%fc.length];
+    svg+=`<line x1="${cx}" y1="${cy}" x2="${bx}" y2="${by}" stroke="${c}" stroke-width="2.5" stroke-dasharray="5,3" opacity=".65"/>`;
+    svg+=`<ellipse cx="${bx}" cy="${by}" rx="74" ry="29" fill="${c}" opacity=".18" stroke="${c}" stroke-width="1.8"/>`;
+    svg+=`<text x="${bx}" y="${by}" text-anchor="middle" dominant-baseline="middle" fill="${c}" font-family="Outfit,sans-serif" font-weight="800" font-size="12">${(b.label||'').slice(0,14)}</text>`;
+    (b.children||[]).forEach((ch,ci2)=>{
+      const sp=Math.min(0.55,0.9/(b.children.length));
+      const ca=ang+(ci2-(b.children.length-1)/2)*sp;
+      const lx=bx+145*Math.cos(ca), ly=by+115*Math.sin(ca);
+      svg+=`<line x1="${bx}" y1="${by}" x2="${lx}" y2="${ly}" stroke="${c}" stroke-width="1.3" opacity=".4"/>`;
+      svg+=`<rect x="${lx-54}" y="${ly-15}" width="108" height="30" rx="8" fill="${c}" opacity=".11" stroke="${c}" stroke-width="1"/>`;
+      svg+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="${c}" font-family="Outfit,sans-serif" font-size="11">${(ch||'').slice(0,16)}</text>`;
+    });
+  });
+  svg+=`</svg>`; wrap.innerHTML=svg;
+}
+
+async function getBoost(pre=''){
+  const inp=document.getElementById('motiinput');
+  const txt=pre||inp.value.trim(); if(!txt){alert('Tell me how you feel!');return;}
+  if(pre) inp.value=pre;
+  const btn=document.getElementById('motibtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>Firing up…';
+  const out=document.getElementById('motiout');
+  out.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px"><span class="spin"></span></div>';
+  try{
+    const r=await ai([
+      {role:'system',content:'You are a world-class motivational study coach. Be genuinely inspiring, warm, and energizing. Never be generic.'},
+      {role:'user',content:`Student says: "${txt}"\n\nGive: 1) A powerful personal 3-4 sentence motivational message addressing exactly what they said. 2) One practical tip to start RIGHT NOW. 3) One memorable quote with author name that fits their situation.`}
+    ], 0.85);
+    const parts=r.split('\n\n').filter(Boolean);
+    out.innerHTML=`<div class="moti-quote">${(parts[0]||r).replace(/\n/g,'<br>')}</div>${parts.slice(1).map(p=>`<div class="moti-tip">${fmt(p)}</div>`).join('')}`;
+  }catch(e){out.innerHTML='⚠️ '+e.message;}
+  btn.disabled=false; btn.innerHTML='💪 Boost Me!';
+}
+
+function qboost(t){ document.getElementById('motiinput').value=t; getBoost(t); }
+</script>
+</body>
+</html>
