@@ -27,7 +27,7 @@
 ## 🛠️ Tech Stack
 
 - **Frontend:** HTML, CSS, JavaScript
-- **AI:** Claude Sonnet (Anthropic API)
+- **AI:** Groq ai ,Meta's Llama 3.3708
 - **Deployment:** GitHub Pages
 
 ---
