@@ -47,7 +47,3 @@
 HACK-N-WIN 3.0
 
 ---
-
-## 🔗 Live Demo
-
-[Click here to try StudyBuddy AI](https://nitigarg567-gif.github.io/smart-ai-chatbot-/studybuddy%20(1).html)
