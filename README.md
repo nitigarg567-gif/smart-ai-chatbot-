@@ -34,7 +34,7 @@
 
 ## 🏃 How to Run
 
-1. Download `index.html`
+1. Download `studybuddy.html`
 2. Double click — opens in browser
 3. Get free API key from groq.com
 4. Paste key and click Launch!
