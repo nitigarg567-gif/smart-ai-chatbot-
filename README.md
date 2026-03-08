@@ -32,14 +32,22 @@
 
 ---
 
-## 🚀 How to Use
+## 🏃 How to Run
 
-1. Open the live demo link
-2. Type your query in the chat box — e.g. *"Quiz me on photosynthesis"*
-3. Or click any feature chip on the home screen
-4. Use the sidebar to switch between features directly
+1. Download `index.html`
+2. Double click — opens in browser
+3. Get free API key from groq.com
+4. Paste key and click Launch!
 
 ---
+
+## 🔑 Get Free API Key
+
+1. Go to **console.groq.com**
+2. Sign up with Google
+3. Click **"Create API Key"**
+4. Copy key starting with **gsk_**
+5. Paste in app — done!
 
 ## 👥 Team
 
